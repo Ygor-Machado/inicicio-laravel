@@ -116,4 +116,32 @@ class EventController extends Controller
 
         return redirect('/dashboard')->with('msg','Evento excluido com sucesso!');
     }
+
+    public function edit($id) 
+    {
+        $event = Event::findOrFail($id);
+
+        return view('events.edit', [
+            'event' => $event
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $event = Event::findOrFail($request->id);
+        $data = $request->all();
+
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+
+            unlink(public_path('img/events/' . $event->image));
+            $requestImage = $request->image;
+            $extension = $requestImage->extension();
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
+            $requestImage->move(public_path('img/events'), $imageName);
+            $data['image'] = $imageName;
+        }
+        Event::findOrFail($request->id)->update($data);
+
+        return redirect('/dashboard')->with('msg', 'Evento editado com sucesso!');
+    }
 }
