@@ -154,7 +154,8 @@ class EventController extends Controller
         return redirect('/dashboard')->with('msg', 'Evento editado com sucesso!');
     }
 
-    public function joinEvent($id) {
+    public function joinEvent($id)
+    {
         $user = auth()->user();
         $event = Event::findOrFail($id);
     
@@ -166,5 +167,16 @@ class EventController extends Controller
         $user->eventsAsParticipant()->attach($id);
     
         return back()->with('msg', 'Sua presença está confirmada no evento ' . $event->title);
+    }
+
+    public function leaveEvent($id)
+    {
+        $user = auth()->user();
+
+        $user->eventsAsParticipant()->detach($id);
+
+        $event = Event::findOrFail($id);
+
+        return back()->with('msg', 'Você saiu com sucesso do evento ' . $event->title);
     }
 }
